@@ -4,10 +4,13 @@ const mongoose = require("mongoose");
 const passportConfig = require("./lib/passportConfig");
 const cors = require("cors");
 const fs = require("fs");
+const dotenv=require("dotenv");
+
+dotenv.config();
 
 // MongoDB
 mongoose
-  .connect("mongodb+srv://Kishore:m2eQuozrDUPl14NI@cluster0.5kp7w.mongodb.net/?retryWrites=true&w=majority", {
+  .connect(process.env.MONGO_URL, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useCreateIndex: true,
@@ -28,13 +31,17 @@ if (!fs.existsSync("./public/profile")) {
 }
 
 const app = express();
-const port = 4444;
+
 
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
 
 // Setting up middlewares
-app.use(cors());
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 app.use(express.json());
 app.use(passportConfig.initialize());
 
@@ -44,6 +51,6 @@ app.use("/api", require("./routes/apiRoutes"));
 app.use("/upload", require("./routes/uploadRoutes"));
 app.use("/host", require("./routes/downloadRoutes"));
 
-app.listen(port, () => {
-  console.log(`Server started on port ${port}!`);
+app.listen(process.env.PORT||4444, () => {
+  console.log(`Server started`);
 });
